@@ -3,7 +3,7 @@ import type { NextRequest } from 'next/server'
 
 export async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl
-  const sessionToken = request.cookies.get('session_token')?.value
+  const sessionToken = request.cookies.get('__Host-session_token')?.value
 
   let isAuthenticated = false
 
@@ -12,7 +12,8 @@ export async function proxy(request: NextRequest) {
       const validateUrl = new URL('/api/auth/validate-session', request.url)
       const res = await fetch(validateUrl, {
         headers: {
-          cookie: `session_token=${sessionToken}`,
+          cookie: `__Host-session_token=${sessionToken}`,
+          'x-internal-request': 'true',
         },
         cache: 'no-store',
       })
@@ -25,7 +26,11 @@ export async function proxy(request: NextRequest) {
     }
   }
 
-  const isAuthRoute = pathname === '/login' || pathname === '/signup'
+  const isGuestRoute =
+    pathname === '/login' ||
+    pathname === '/signup' ||
+    pathname === '/forgot-password' ||
+    pathname === '/reset-password'
   const isProtectedRoute = pathname.startsWith('/dashboard')
 
   // Redirect unauthenticated users trying to access dashboard -> /login
@@ -34,8 +39,8 @@ export async function proxy(request: NextRequest) {
     return NextResponse.redirect(loginUrl)
   }
 
-  // Redirect authenticated users trying to access login/signup -> /dashboard
-  if (isAuthRoute && isAuthenticated) {
+  // Redirect authenticated users trying to access guest-only pages -> /dashboard
+  if (isGuestRoute && isAuthenticated) {
     const dashboardUrl = new URL('/dashboard', request.url)
     return NextResponse.redirect(dashboardUrl)
   }
@@ -44,5 +49,5 @@ export async function proxy(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ['/dashboard/:path*', '/login', '/signup'],
+  matcher: ['/dashboard/:path*', '/login', '/signup', '/forgot-password', '/reset-password'],
 }

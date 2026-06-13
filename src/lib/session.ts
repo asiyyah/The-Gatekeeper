@@ -2,7 +2,7 @@ import { cookies } from 'next/headers'
 import crypto from 'crypto'
 import { prisma } from './prisma'
 
-const SESSION_COOKIE_NAME = 'session_token'
+const SESSION_COOKIE_NAME = '__Host-session_token'
 const SESSION_EXPIRY_DAYS = 7
 
 export async function createSession(userId: string) {
@@ -23,8 +23,8 @@ export async function createSession(userId: string) {
   const cookieStore = await cookies()
   cookieStore.set(SESSION_COOKIE_NAME, token, {
     httpOnly: true,
-    secure: process.env.NODE_ENV === 'production',
-    sameSite: 'lax',
+    secure: true,
+    sameSite: 'strict',
     expires: expiresAt,
     path: '/',
   })

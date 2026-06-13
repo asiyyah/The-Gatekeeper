@@ -1,5 +1,5 @@
 import { redirect } from 'next/navigation'
-import { ShieldCheck, LogOut, User, Mail, Calendar, Key } from 'lucide-react'
+import { ShieldCheck, LogOut, User, Mail, Calendar } from 'lucide-react'
 import { getSession } from '@/lib/session'
 import { logoutAction } from '@/actions/auth'
 
@@ -12,19 +12,12 @@ export default async function DashboardPage() {
     redirect('/login')
   }
 
-  const { user, session } = sessionData
+  const { user } = sessionData
 
-  // Format creation date
   const memberSince = new Date(user.createdAt).toLocaleDateString('en-US', {
     year: 'numeric',
     month: 'long',
     day: 'numeric',
-  })
-
-  // Format session expiration
-  const sessionExpires = new Date(session.expiresAt).toLocaleString('en-US', {
-    dateStyle: 'medium',
-    timeStyle: 'short',
   })
 
   return (
@@ -101,56 +94,6 @@ export default async function DashboardPage() {
                 </div>
               </div>
             </div>
-
-            {/* Session Information Card */}
-            <div className="rounded-2xl border border-zinc-800 bg-zinc-900/40 p-6 backdrop-blur-xl">
-              <h2 className="text-sm font-semibold uppercase tracking-wider text-zinc-400">Session Diagnostics</h2>
-              <div className="mt-6 space-y-4">
-                <div className="flex items-center gap-3">
-                  <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-zinc-950 border border-zinc-800">
-                    <Key className="h-5 w-5 text-teal-400" />
-                  </div>
-                  <div className="min-w-0 flex-1">
-                    <p className="text-xs text-zinc-500">Session Token (Truncated)</p>
-                    <p className="truncate text-sm font-mono text-zinc-300">
-                      {session.token.slice(0, 8)}...{session.token.slice(-8)}
-                    </p>
-                  </div>
-                </div>
-
-                <div className="flex items-center gap-3">
-                  <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-zinc-950 border border-zinc-800">
-                    <Calendar className="h-5 w-5 text-teal-400" />
-                  </div>
-                  <div>
-                    <p className="text-xs text-zinc-500">Session Expires</p>
-                    <p className="text-sm font-medium text-white">{sessionExpires}</p>
-                  </div>
-                </div>
-
-                <div className="rounded-xl bg-zinc-950 p-4 border border-zinc-800 text-xs text-zinc-500">
-                  <span className="font-semibold text-emerald-400">Security Note:</span> This session resides in the database and is verified server-side on every page load. The session cookie is protected with <code className="text-zinc-300">HttpOnly</code>, <code className="text-zinc-300">Secure</code>, and <code className="text-zinc-300">SameSite=Lax</code>.
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* Action Center Banner */}
-          <div className="mt-8 rounded-2xl border border-zinc-800 bg-gradient-to-r from-emerald-950/20 via-zinc-900/40 to-zinc-900/40 p-6 backdrop-blur-xl flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-            <div>
-              <h3 className="text-base font-semibold text-white">Need to close your session?</h3>
-              <p className="text-xs text-zinc-400 mt-1">Logging out will delete the active session token from our database permanently.</p>
-            </div>
-            <form action={logoutAction}>
-              <button
-                id="btn_logout_dashboard"
-                type="submit"
-                className="w-full sm:w-auto flex items-center justify-center gap-2 rounded-xl bg-zinc-800 border border-zinc-700 px-5 py-2.5 text-sm font-medium text-white transition duration-200 hover:bg-zinc-700 hover:border-zinc-600"
-              >
-                <LogOut className="h-4 w-4" />
-                Sign Out
-              </button>
-            </form>
           </div>
         </div>
       </div>

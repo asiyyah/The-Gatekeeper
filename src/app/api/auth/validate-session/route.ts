@@ -2,6 +2,11 @@ import { NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 
 export async function GET(request: Request) {
+  const requestHeaders = request.headers
+  if (requestHeaders.get('x-internal-request') !== 'true') {
+    return NextResponse.json({ isValid: false }, { status: 403 })
+  }
+
   const cookieHeader = request.headers.get('cookie')
   let token: string | null = null
 
@@ -13,7 +18,7 @@ export async function GET(request: Request) {
       acc[key] = value
       return acc
     }, {} as Record<string, string>)
-    token = cookies['session_token']
+    token = cookies['__Host-session_token']
   }
 
   if (!token) {
@@ -39,7 +44,6 @@ export async function GET(request: Request) {
     }
 
     if (new Date() > dbSession.expiresAt) {
-      // Session expired, remove it
       await prisma.session.delete({
         where: { token },
       }).catch(() => {})

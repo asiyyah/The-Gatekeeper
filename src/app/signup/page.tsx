@@ -25,14 +25,13 @@ export default function SignupPage() {
   // Watch password for live strength checking
   const passwordValue = watch('password', '')
 
-  // Calculate password strength score (0-4)
   const getPasswordStrength = (pass: string) => {
     if (!pass) return 0
     let score = 0
     if (pass.length >= 8) score += 1
-    if (/[A-Z]/.test(pass)) score += 1
-    if (/[a-z]/.test(pass)) score += 1
+    if (/[A-Za-z]/.test(pass)) score += 1
     if (/[0-9]/.test(pass)) score += 1
+    if (/[^A-Za-z0-9]/.test(pass)) score += 1
     return score
   }
 
@@ -216,8 +215,7 @@ export default function SignupPage() {
                   {/* Hint lists */}
                   <ul className="mt-2 space-y-1 text-[11px] text-zinc-500">
                     <li className={passwordValue.length >= 8 ? 'text-emerald-400' : ''}>• Minimum 8 characters</li>
-                    <li className={/[A-Z]/.test(passwordValue) ? 'text-emerald-400' : ''}>• At least 1 uppercase letter</li>
-                    <li className={/[a-z]/.test(passwordValue) ? 'text-emerald-400' : ''}>• At least 1 lowercase letter</li>
+                    <li className={/[A-Za-z]/.test(passwordValue) ? 'text-emerald-400' : ''}>• At least 1 letter</li>
                     <li className={/[0-9]/.test(passwordValue) ? 'text-emerald-400' : ''}>• At least 1 number</li>
                   </ul>
                 </div>
